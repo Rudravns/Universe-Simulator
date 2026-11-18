@@ -1,7 +1,7 @@
 #include "raylib.h"
-#include "plane.h"
-#include "planet.h"
-#include <Window.h>
+#include "../include/windows/plane.h"
+#include "../include/Planets/planet.h"
+#include "../include/windows/Window.h"
 
 
 
@@ -12,13 +12,12 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Universe Simulator");
 
     // 3D Camera
-    Camera3D camera = { 0 };
+    Camera3D camera{};
     camera.position = { 5.0f, 5.0f, 5.0f };
     camera.target = { 0.0f, 0.0f, 0.0f };
     camera.up = { 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
-    camera.project
-    'ion = CAMERA_PERSPECTIVE;
+    camera.projection = CAMERA_PERSPECTIVE;
 
     // FPS
     int refreshRate = GetMonitorRefreshRate(GetCurrentMonitor());
@@ -29,8 +28,9 @@ int main() {
     DisableCursor();
     bool isCursorLocked = true;
     
-    // Plantes
-    planet earth(5.972e24, 1.0f, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, WHITE);
+    // PlanETs
+    planet earth{5.972e24, 1.0f, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, BLUE};
+    
             
     while (!WindowShouldClose()) {
         UpdateCamera(&camera, CAMERA_FREE);
@@ -55,10 +55,12 @@ int main() {
 
         BeginDrawing();
         ClearBackground(BLACK);
-
+        
         BeginMode3D(camera);
 
         DrawGrid(20, 1.0f);
+
+        
         earth.Draw();
         
         

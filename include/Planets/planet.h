@@ -1,18 +1,16 @@
-#ifndef planet_h
-#define planet_h
-
+#ifndef PLANET_H
+#define PLANET_H
 
 #include "raylib.h"
-#include "attr.h"
+#include "attr.h" // Or wherever celest_attr is defined
 
 class planet {
-    private:
-        celest_attr attr;
-    public:
-        planet(double mass, double radius, Vector3 position, Vector3 velocity); // Default constructor
-        planet(celest_attr attr);    
-        void Update(float deltaTime);
-        void Draw();
+public:
+    celest_attr attributes;
+
+    planet(double mass, double radius, Vector3 position, Vector3 velocity, Color color);
+    void Update(float deltaTime);
+    void Draw() const;
 };
 
-#endif // planet_h
+#endif

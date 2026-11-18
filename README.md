@@ -33,7 +33,11 @@ UniverseSimulator/
 │
 ├── src/
 │   ├── main.cpp
-│   └── window.cpp
+|   ├── Planets
+|   |   ├── planet.cpp
+|   |   └── attr.cpp
+│   └── windows
+|       └── window.cpp
 │
 ├── build.ps1
 ├── .gitignore

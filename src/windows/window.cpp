@@ -1,4 +1,4 @@
-#include "window.h"
+#include "windows/Window.h"
 #include "raylib.h"
 
 void ToggleFullscreenWindow(int windowWidth, int windowHeight) {

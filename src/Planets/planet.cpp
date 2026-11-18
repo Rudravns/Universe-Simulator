@@ -1,31 +1,26 @@
-#include "raylib.h"
-#include "attr.h"
+#include "Planets/planet.h"
 
-class planet {
-    private:
-        celest_attr attr;
-    public:
+// Constructor implementation
+planet::planet(double mass, double radius, Vector3 position, Vector3 velocity, Color color) {
+    attributes.mass = mass;
+    attributes.radius = radius;
+    attributes.position = position;
+    attributes.velocity = velocity;
+    attributes.color = color;
+}
 
-        planet(double mass, double radius, Vector3 position, Vector3 velocity, Color color) {
-            attr.mass = mass;
-            attr.radius = radius;
-            attr.position = position;
-            attr.velocity = velocity;
-            attr.color = color;
-        }
+// Update implementation
+void planet::Update(float deltaTime) {
+    attributes.position.x += attributes.velocity.x * deltaTime;
+    attributes.position.y += attributes.velocity.y * deltaTime;
+    attributes.position.z += attributes.velocity.z * deltaTime;
+}
 
-        planet(celest_attr attr){
-            this->attr = attr;
-        }
-
-        void Update(float deltaTime){
-            attr.position.x += attr.velocity.x * deltaTime;
-            attr.position.y += attr.velocity.y * deltaTime;
-            attr.position.z += attr.velocity.z * deltaTime;
-        }
-
-        void Draw(){
-            DrawSphere(attr.position, attr.radius, attr.color);
-        }
-        
-};
+// Draw implementation
+void planet::Draw() const {
+    DrawSphere(
+        attributes.position,
+        static_cast<float>(attributes.radius),
+        attributes.color
+    );
+}

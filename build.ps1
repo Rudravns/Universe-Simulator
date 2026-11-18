@@ -35,7 +35,8 @@ Write-Host "Using Raylib headers: $raylibInclude"
     -I (Join-Path $PSScriptRoot "include") `
     -I $raylibInclude `
     (Join-Path $PSScriptRoot "src\main.cpp") `
-    (Join-Path $PSScriptRoot "src\window.cpp") `
+    (Join-Path $PSScriptRoot "src\windows\window.cpp") `
+    (Join-Path $PSScriptRoot "src\Planets\planet.cpp") `
     -o $output `
     -L $raylibLib `
     -lraylib -lopengl32 -lgdi32 -lwinmm
@@ -45,7 +46,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "`nBuild successful!" -ForegroundColor Green
     Write-Host "Starting Universe Simulator..." -ForegroundColor Cyan
 
-    & ".\$output"
+    & $output
 }
 else {
     Write-Host "`nBuild failed. Check the errors above." -ForegroundColor Red
