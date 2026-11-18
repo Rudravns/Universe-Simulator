@@ -1,0 +1,36 @@
+# Compiled executables
+*.exe
+*.dll
+*.o
+*.obj
+*.a
+*.lib
+
+# Build directories
+build/
+bin/
+dist/
+
+# Debugging files
+*.pdb
+*.ilk
+*.stackdump
+
+# IDE settings
+.vscode/*
+!.vscode/c_cpp_properties.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
