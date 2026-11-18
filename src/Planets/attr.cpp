@@ -7,4 +7,5 @@ struct celest_attr { // Celestial Attributes
     float radius;
     Vector3 position;
     Vector3 velocity;
+    Color color;
 };

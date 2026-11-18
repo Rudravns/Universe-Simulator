@@ -17,7 +17,8 @@ int main() {
     camera.target = { 0.0f, 0.0f, 0.0f };
     camera.up = { 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+    camera.project
+    'ion = CAMERA_PERSPECTIVE;
 
     // FPS
     int refreshRate = GetMonitorRefreshRate(GetCurrentMonitor());
