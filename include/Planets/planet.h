@@ -2,15 +2,18 @@
 #define PLANET_H
 
 #include "raylib.h"
-#include "attr.h" // Or wherever celest_attr is defined
+#include "attr.h"
+#include <array>
 
 class planet {
 public:
     celest_attr attributes;
-
-    planet(double mass, double radius, Vector3 position, Vector3 velocity, Color color);
+    Color color;
+    planet(double mass, double radius, Vector3 position, Vector3 velocity,
+           const std::array<Element, 10>& composition);
     void Update(float deltaTime);
     void Draw() const;
+    Color getColorFromElementComposition() const;
 };
 
 #endif

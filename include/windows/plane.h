@@ -10,10 +10,6 @@
 
 */
 
-void DrawGrid(int slices, float spacing);
+Shader Load_plane_shader();
 
-Vector3 Bezier3d(Vector3 p0, Vector3 p1,Vector3 p2,Vector3 p3, float t);
-
-
-
-#endif // WINDOW_H
+#endif // PLANE_H
