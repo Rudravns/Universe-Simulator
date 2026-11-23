@@ -4,6 +4,8 @@
 #include "raylib.h"
 #include "attr.h"
 #include <array>
+#include <cmath>
+#include <algorithm>
 
 class planet {
 public:
@@ -14,6 +16,7 @@ public:
     void Update(float deltaTime);
     void Draw() const;
     Color getColorFromElementComposition() const;
+    Vector4 getMassPoint();
 };
 
 #endif

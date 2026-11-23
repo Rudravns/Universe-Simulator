@@ -20,9 +20,11 @@ void planet::Update(float deltaTime) {
 
 // Draw implementation
 void planet::Draw() const {
+    // The model stores physical radius in kilometers. Scale it into scene units.
+    constexpr double RADIUS_SCALE = 1.0 / 6000.0;
     DrawSphere(
         attributes.position,
-        static_cast<float>(attributes.radius),
+        static_cast<float>(attributes.radius * RADIUS_SCALE),
         getColorFromElementComposition()
     );
 }
@@ -84,4 +86,24 @@ Color planet::getColorFromElementComposition() const {
         }
     }
     return ColorFromNormalized(vecColor);
+}
+
+Vector4 planet::getMassPoint(){
+    float VisualStrength;
+    if (attributes.mass <= 0.0){
+        VisualStrength = 0.0;
+    }
+
+    else{
+        double exponent = std::log10(attributes.mass);
+        VisualStrength =  static_cast<float>(std::clamp((exponent - 20.0) * 0.12, 0.12, 1.35));
+    }
+
+        
+    return {
+        attributes.position.x,
+        attributes.position.y,
+        attributes.position.z,
+        VisualStrength
+    };
 }

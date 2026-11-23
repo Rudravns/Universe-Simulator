@@ -4,17 +4,9 @@
 #include "../include/Planets/planet.h"
 #include "../include/windows/Window.h"
 #include <array>
-#include <algorithm>
-#include <cmath>
+#include "Planets/celestial.h"
 
 static constexpr int MAX_MASS_POINTS = 8;
-
-static float MassToVisualStrength(double mass)
-{
-    if (mass <= 0.0) return 0.0f;
-    double exponent = std::log10(mass);
-    return static_cast<float>(std::clamp((exponent - 20.0) * 0.12, 0.12, 1.35));
-}
 
 int main() {
     // Window
@@ -39,28 +31,24 @@ int main() {
     DisableCursor();
     bool isCursorLocked = true;
     
-    // Planets
+    // celestial objects
+    Celestial_Objects celestialObjects;
+    
     const std::array<Element, 10> earthComposition{
         Element::Oxygen, Element::Nitrogen, Element::Carbon, Element::Hydrogen,
         Element::Helium, Element::Iron, Element::Silicon, Element::Magnesium,
         Element::Sulfur, Element::Calcium
     };
-    planet earth{
-        5.972e24, 1.0f,
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.65f},
-        earthComposition
-    };
-    planet moon{
-        7.342e22, 0.27f,
-        {2.5f, 0.0f, 0.0f},
-        {0.0f, 0.0f, -0.20f},
-        earthComposition
-    };
-    
+    celestialObjects.add("Earth", 
+        planet(5.972e24, 6371.0, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, earthComposition)
+    );
+    celestialObjects.add("Moon", 
+        planet(7.342e22, 1737.0, {2.5f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, earthComposition)
+    );
+
     // 1. Load shader for plane
     Shader bezierShader = Load_plane_shader();
-    
+
     // 2. Create a subdivided 3D plane mesh so it has enough vertices to bend along the curve
     Mesh planeMesh = GenMeshPlane(12.0f, 12.0f, 64, 64);
     Model planeModel = LoadModelFromMesh(planeMesh);
@@ -70,14 +58,15 @@ int main() {
 
     int massCountLocation = GetShaderLocation(bezierShader, "massCount");
     int massPointsLocation = GetShaderLocation(bezierShader, "massPoints");
+    std::array<Vector4, MAX_MASS_POINTS> massPoints{};
     
     while (!WindowShouldClose()) {
         // BACKEND UPDATES
         UpdateCamera(&camera, CAMERA_FREE);
         float deltaTime = GetFrameTime();
-        earth.Update(deltaTime);
-        moon.Update(deltaTime);
-        
+        celestialObjects.get("Earth").Update(deltaTime);
+        celestialObjects.get("Moon").Update(deltaTime);
+
         if (IsKeyPressed(KEY_F11)) {
             ToggleFullscreenWindow(screenWidth, screenHeight);
         }
@@ -91,51 +80,48 @@ int main() {
             }
         }
 
+        planet& earth = celestialObjects.get("Earth");
+        planet& moon = celestialObjects.get("Moon");
+        massPoints[0] = earth.getMassPoint();
+        massPoints[1] = moon.getMassPoint();
+
+        int massCount = 2;
+        SetShaderValue(bezierShader, massCountLocation, &massCount, SHADER_UNIFORM_INT);
+        SetShaderValueV(
+            bezierShader,
+            massPointsLocation,
+            massPoints.data(),
+            SHADER_UNIFORM_VEC4,
+            massCount
+        );
+
         // FRONTEND DRAWING
         BeginDrawing();
         ClearBackground(BLACK);
         
         BeginMode3D(camera);
 
-            earth.Draw();
-            moon.Draw();
+        // Keep the warped grid and planet surfaces visible from either side.
+        rlDisableBackfaceCulling();
+        rlDisableDepthMask();
+        rlEnableWireMode();
+        
+        DrawModel(planeModel, (Vector3){0, 0, 0}, 1.0f, WHITE);
 
-            std::array<Vector4, MAX_MASS_POINTS> massPoints{};
-            massPoints[0] = {
-                earth.attributes.position.x,
-                earth.attributes.position.y,
-                earth.attributes.position.z,
-                MassToVisualStrength(earth.attributes.mass)
-            };
-            massPoints[1] = {
-                moon.attributes.position.x,
-                moon.attributes.position.y,
-                moon.attributes.position.z,
-                MassToVisualStrength(moon.attributes.mass)
-            };
+        rlDisableWireMode();
+        rlEnableDepthMask();
 
-            int massCount = 2;
-            SetShaderValue(bezierShader, massCountLocation, &massCount, SHADER_UNIFORM_INT);
-            SetShaderValueV(
-                bezierShader,
-                massPointsLocation,
-                massPoints.data(),
-                SHADER_UNIFORM_VEC4,
-                massCount
-            );
+        earth.Draw();
+        moon.Draw();
 
-            rlEnableWireMode();
+        rlEnableBackfaceCulling();
 
-            DrawModel(planeModel, (Vector3){0, 0, 0}, 1.0f, WHITE);
+        EndMode3D();
 
-            rlDisableWireMode();
-            
-            EndMode3D();
+        DrawText("Universe Simulator", 20, 20, 25, WHITE);
+        DrawFPS(20, 55);
 
-            DrawText("Universe Simulator", 20, 20, 25, WHITE);
-            DrawFPS(20, 55);
-
-            EndDrawing();
+        EndDrawing();
     }
 
     // Cleanup resources

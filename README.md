@@ -1,46 +1,53 @@
 # Universe Simulator
 
-A 3D universe simulation built with **C++20** and **Raylib 6.0**.
+A 3D universe simulator built with **C++20** and **Raylib**.
 
-The goal of this project is to create an interactive 3D environment that simulates celestial bodies and gravitational interactions.
+The project renders celestial bodies in a 3D scene and uses a custom shader to create a curved spacetime-style plane around them.
 
 ## Features
 
 - 3D rendering with Raylib
-- Free 3D camera movement
+- Free-look 3D camera
+- Earth and Moon models with element-based colors
+- Visual scaling from physical radii into scene units
+- Custom vertex shader for a warped spacetime plane
+- Basic per-frame position updates
 - Fullscreen toggle (`F11`)
 - Mouse cursor lock toggle (`TAB`)
-- Celestial bodies (planets, moons, stars)
-- Newtonian gravitational simulation
-- N-body physics
-- Orbital mechanics
-- Solar system simulation
 
 ## Tech Stack
 
 - **Language:** C++20
-- **Graphics Library:** Raylib 6.0
+- **Graphics Library:** Raylib
 - **Compiler:** GCC (MinGW-w64)
 - **Build System:** PowerShell
+- **Shader:** GLSL 330
 
 ## Project Structure
 
 ```text
-UniverseSimulator/
-│
+Universe-Simulator/
 ├── include/
-│   └── Window.h
-│
+│   ├── Planets/
+│   │   ├── attr.h
+│   │   ├── celestial.h
+│   │   └── planet.h
+│   └── windows/
+│       ├── Window.h
+│       └── plane.h
 ├── src/
 │   ├── main.cpp
-|   ├── Planets
-|   |   ├── planet.cpp
-|   |   └── attr.cpp
-│   └── windows
-|       └── window.cpp
-│
+│   ├── Planets/
+│   │   ├── attr.cpp
+│   │   ├── celestial.cpp
+│   │   └── planet.cpp
+│   └── windows/
+│       ├── plane.cpp
+│       └── window.cpp
+├── Shaders/
+│   └── Vertex/
+│       └── 2d_plane.glsl
 ├── build.ps1
-├── .gitignore
 └── README.md
 ```
 
@@ -59,13 +66,13 @@ UniverseSimulator/
 - Windows
 - GCC / MinGW-w64
 - C++20 support
-- Raylib 6.0
+- Raylib for MinGW with both `include/raylib.h` and `lib/libraylib.a`
 
 ## Building and Running
 
 1. Install GCC / MinGW-w64.
-2. Download and extract Raylib 6.0.
-3. Update the Raylib paths in `build.ps1` if necessary.
+2. Download and extract a MinGW-compatible Raylib build.
+3. Set `RAYLIB_ROOT` or pass `-RaylibRoot` if Raylib is outside a standard location.
 4. Open the project directory in PowerShell.
 5. Run:
 
@@ -85,7 +92,7 @@ The script compiles all C++ sources into `main.exe` and runs it if compilation s
 
 ## Future Goals
 
-The long-term goal is to build a 3D universe simulator featuring realistic gravitational interactions, orbital mechanics, and multiple interacting celestial bodies.
+Future development may add N-body gravity, orbital mechanics, multiple interacting celestial bodies, and more accurate physical-to-visual scaling.
 
 ---
 

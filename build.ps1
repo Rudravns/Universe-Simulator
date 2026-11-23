@@ -206,7 +206,7 @@ if (($env:PATH -split ';') -notcontains $compilerDirectory) {
     $env:PATH = "$compilerDirectory;$env:PATH"
 }
 
-$args = @("-std=c++20", "-Wall", "-Wextra")
+$args = @("-std=c++20", "-g", "-O0", "-Wall", "-Wextra")
 $args += $sourceFiles
 $args += "-o"
 $args += $outputPath
@@ -214,6 +214,7 @@ $args += "-I$(Join-Path $ProjectRoot 'include')"
 $args += "-I$raylibInclude"
 $args += "-L$raylibLib"
 $args += "-lraylib", "-lopengl32", "-lgdi32", "-lwinmm"
+
 
 Write-Host "Compiling with $(Split-Path $compilerPath -Leaf)..." -ForegroundColor Cyan
 & $compilerPath @args
@@ -232,3 +233,4 @@ if (-not $NoRun) {
     Write-Host "Starting Universe Simulator..." -ForegroundColor Green
     & $outputPath
 }
+
