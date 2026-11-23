@@ -124,14 +124,18 @@ int main() {
                 massCount
             );
 
-            DrawModel(planeModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, WHITE);
+            rlEnableWireMode();
 
-        EndMode3D();
+            DrawModel(planeModel, (Vector3){0, 0, 0}, 1.0f, WHITE);
 
-        DrawText("Universe Simulator", 20, 20, 25, WHITE);
-        DrawFPS(20, 55);
+            rlDisableWireMode();
+            
+            EndMode3D();
 
-        EndDrawing();
+            DrawText("Universe Simulator", 20, 20, 25, WHITE);
+            DrawFPS(20, 55);
+
+            EndDrawing();
     }
 
     // Cleanup resources

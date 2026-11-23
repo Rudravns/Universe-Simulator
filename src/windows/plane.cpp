@@ -44,11 +44,10 @@ Vector3 Bezier3d(Vector3 p0, Vector3 p1,Vector3 p2,Vector3 p3, float t)
 
 */
 
-// Custom fragment shader + raylib's default vertex shader
 Shader Load_plane_shader() {
     Shader fabricShader = LoadShader(
         "Shaders/Vertex/2d_plane.glsl",
-        "Shaders/Vertex/2d_plane.fs"
+        nullptr
     );
 
     if (fabricShader.id == 0)

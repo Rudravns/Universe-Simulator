@@ -73,7 +73,15 @@ UniverseSimulator/
 .\build.ps1
 ```
 
-The script compiles the project into `main.exe` and runs it if compilation succeeds.
+Set `RAYLIB_ROOT` or pass `-RaylibRoot` when Raylib is outside a standard location:
+
+```powershell
+.\build.ps1 -RaylibRoot "C:\path\to\raylib-6.0_win64_mingw-w64"
+```
+
+Use `-Compiler C:\path\to\g++.exe` if MinGW-w64 is not on `PATH`, or `-NoRun` to compile without starting the simulator.
+
+The script compiles all C++ sources into `main.exe` and runs it if compilation succeeds.
 
 ## Future Goals
 
