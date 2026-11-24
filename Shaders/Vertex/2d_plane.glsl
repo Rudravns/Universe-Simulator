@@ -26,13 +26,12 @@ void main()
         gravitationalPotential += massPoints[i].w * inversesqrt(distanceSquared + softeningSquared);
     }
 
+    // You: ChatGPT, undercomplicate my code
+    // ChatGPT: Ok, un-compiling the code
+    // You: NOOOOOOO
     float curvature = 1.0 - exp(-0.55 * gravitationalPotential);
     worldPosition.y -= 8.0 * curvature;
 
-    vec2 gridDistance = abs(fract(vertexPosition.xz + 0.5) - 0.5);
-    float gridLine = 1.0 - smoothstep(0.40, 0.48, min(gridDistance.x, gridDistance.y));
-
-    fragTexCoord = vertexTexCoord;
-    fragColor = vertexColor * vec4(vec3(0.72), gridLine);
+    fragColor = vertexColor * vec4(0.72, 0.72, 0.72, 1.0);
     gl_Position = mvp * vec4(worldPosition, 1.0);
 }

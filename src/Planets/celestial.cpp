@@ -12,6 +12,9 @@ bool Celestial_Objects::add(const std::string &name, const planet &newPlanet)
     return inserted;
 }
 
+/*
+Getter but only read-only
+*/
 const planet& Celestial_Objects::get(const std::string &name) const
 {
     auto Iterator = Planets.find(name); // find the planet name from the list of planets
@@ -22,6 +25,11 @@ const planet& Celestial_Objects::get(const std::string &name) const
     }
     throw std::runtime_error("Planet not found: " + name);
 }
+
+
+/*
+Getter but read and write
+*/
 
 planet& Celestial_Objects::get(const std::string &name)
 {

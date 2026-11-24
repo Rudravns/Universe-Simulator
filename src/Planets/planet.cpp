@@ -18,6 +18,28 @@ void planet::Update(float deltaTime) {
     attributes.position.z += attributes.velocity.z * deltaTime;
 }
 
+
+void planet::Push(Vector3 velocity_ip){
+    attributes.velocity = Vector3Add(velocity_ip, attributes.velocity);
+}
+
+void planet::Stop(){attributes.velocity = {0};}
+void planet::ZeroAcceleration(){attributes.acceleration = {0};}
+
+void planet::Change_Acceleration(Vector3 dt){ 
+    attributes.acceleration = Vector3Add(dt, attributes.acceleration);
+}
+
+void planet::updateAngle(Vector3 delta_angle){
+    attributes.Direction =  Vector3Add(delta_angle, attributes.Direction);
+}
+
+void planet::PushForward(double push) {
+    attributes.velocity.x += attributes.Direction.x * push;
+    attributes.velocity.y += attributes.Direction.y * push;
+    attributes.velocity.z += attributes.Direction.z * push;
+}
+
 // Draw implementation
 void planet::Draw() const {
     // The model stores physical radius in kilometers. Scale it into scene units.
@@ -105,5 +127,15 @@ Vector4 planet::getMassPoint(){
         attributes.position.y,
         attributes.position.z,
         VisualStrength
+    };
+}
+
+Vector4 planet::getRaw(){
+        
+    return {
+        attributes.position.x,
+        attributes.position.y,
+        attributes.position.z,
+        static_cast<float>(attributes.mass)
     };
 }

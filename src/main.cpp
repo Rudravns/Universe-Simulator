@@ -7,8 +7,25 @@
 #include "Planets/celestial.h"
 
 static constexpr int MAX_MASS_POINTS = 8;
+void ArrowKeys(planet& earth){
+    if (IsKeyDown(KEY_UP)) {
+        earth.PushForward(10 * GetFrameTime() * 60);
+    }
+    if (IsKeyDown(KEY_DOWN)) {
+      earth.PushForward(-10 * GetFrameTime() * 60);
+    }
+    if (IsKeyDown(KEY_RIGHT)) {
+        earth.updateAngle({0, -5 * GetFrameTime() * 60, 0});
+    }
 
+    if (IsKeyDown(KEY_LEFT)) {
+        earth.updateAngle({0, 5 * GetFrameTime() * 60, 0});
+    }
+}
 int main() {
+    int age;
+    std::cin >> age;
+    
     // Window
     const int screenWidth = 1280;
     const int screenHeight = 720;
@@ -34,43 +51,65 @@ int main() {
     // celestial objects
     Celestial_Objects celestialObjects;
     
+    // Creating Earth Color
     const std::array<Element, 10> earthComposition{
         Element::Oxygen, Element::Nitrogen, Element::Carbon, Element::Hydrogen,
         Element::Helium, Element::Iron, Element::Silicon, Element::Magnesium,
         Element::Sulfur, Element::Calcium
     };
+    const std::array<Element, 10> moonComposition{
+        Element::Oxygen,
+        Element::Silicon,
+        Element::Magnesium,
+        Element::Iron,
+        Element::Calcium,
+        Element::Aluminum
+    };
+
+    
+    // Creating Earth
     celestialObjects.add("Earth", 
         planet(5.972e24, 6371.0, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, earthComposition)
     );
+    
+    // Creating Moon
     celestialObjects.add("Moon", 
-        planet(7.342e22, 1737.0, {2.5f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, earthComposition)
+        planet(7.342e22, 1737.0, {2.5f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, moonComposition)
     );
 
     // 1. Load shader for plane
     Shader bezierShader = Load_plane_shader();
 
     // 2. Create a subdivided 3D plane mesh so it has enough vertices to bend along the curve
-    Mesh planeMesh = GenMeshPlane(12.0f, 12.0f, 64, 64);
+    Mesh planeMesh = GenMeshPlane(12.0f, 12.0f, std::pow(2, 7), std::pow(2, 7)); //parm are w, l, resx, resy ; res is in bit logic
     Model planeModel = LoadModelFromMesh(planeMesh);
 
     // 3. Attach your custom Bezier shader to the model's material
     planeModel.materials[0].shader = bezierShader;
 
+    // Mass Related Calculations
     int massCountLocation = GetShaderLocation(bezierShader, "massCount");
     int massPointsLocation = GetShaderLocation(bezierShader, "massPoints");
     std::array<Vector4, MAX_MASS_POINTS> massPoints{};
     
+    // Should window close? That's up to you!
     while (!WindowShouldClose()) {
         // BACKEND UPDATES
+        // Camera
         UpdateCamera(&camera, CAMERA_FREE);
+        // DeltaTime
         float deltaTime = GetFrameTime();
+        // Update Planets
         celestialObjects.get("Earth").Update(deltaTime);
         celestialObjects.get("Moon").Update(deltaTime);
 
+
+
+        // Key Logic
         if (IsKeyPressed(KEY_F11)) {
             ToggleFullscreenWindow(screenWidth, screenHeight);
         }
-
+        
         if (IsKeyPressed(KEY_TAB)) {
             isCursorLocked = !isCursorLocked;
             if (isCursorLocked) {
@@ -80,11 +119,14 @@ int main() {
             }
         }
 
+
+
+        // Get position in memory of planet
         planet& earth = celestialObjects.get("Earth");
         planet& moon = celestialObjects.get("Moon");
         massPoints[0] = earth.getMassPoint();
         massPoints[1] = moon.getMassPoint();
-
+        ArrowKeys(earth);
         int massCount = 2;
         SetShaderValue(bezierShader, massCountLocation, &massCount, SHADER_UNIFORM_INT);
         SetShaderValueV(
@@ -132,3 +174,5 @@ int main() {
 
     return 0;
 }
+
+ 

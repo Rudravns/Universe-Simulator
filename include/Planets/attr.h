@@ -20,11 +20,21 @@ enum class Element {
 
 struct celest_attr { // Celestial Attributes
     public:
+
+    //structure 
     double mass;
     double radius;
-    Vector3 position;
-    Vector3 velocity;
+    
+    // compostion
     std::array<Element, 10> composition;
+    
+    // space position
+    Vector3 position;
+    Vector3 velocity = {0};
+    Vector3 acceleration = {0};
+    Vector3 Direction = {0}; 
+    
+    
 };
 
 #endif // CELESTIAL_ATTR_H

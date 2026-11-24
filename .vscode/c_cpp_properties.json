@@ -8,6 +8,7 @@
             "cStandard": "c17",
             "includePath": [
                 "${workspaceFolder}/**",
+                "C:/Users/kumar1272/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/include",
                 "${env:RAYLIB_ROOT}/include",
                 "${env:RAYLIB_PATH}/include"
             ]

@@ -16,6 +16,7 @@ private:
 
 public:
     bool add(const std::string &name, const planet &newPlanet);
+    
     const planet& get(const std::string &name) const;
     planet& get(const std::string &name);
 };
