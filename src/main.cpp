@@ -2,26 +2,28 @@
 #include "rlgl.h"
 #include "../include/windows/plane.h"
 #include "../include/Planets/planet.h"
+#include "../include/Physics/Planets/planethandler.h"
 #include "../include/windows/Window.h"
 #include <array>
+#include <cmath>
 #include "Planets/celestial.h"
 
-static constexpr int MAX_MASS_POINTS = 8;
-void ArrowKeys(planet& earth) {
-    const float deltaTime = GetFrameTime();
+
+static constexpr float SIMULATION_TIME_SCALE = 3600.0f;
+void ArrowKeys(planet& earth, float realDeltaTime) {
 
     if (IsKeyDown(KEY_UP)) {
-        earth.PushForward(10 * deltaTime);
+        earth.PushForward(10 * realDeltaTime / SIMULATION_TIME_SCALE);
     }
     if (IsKeyDown(KEY_DOWN)) {
-        earth.PushForward(-10 * deltaTime);
+        earth.PushForward(-10 * realDeltaTime / SIMULATION_TIME_SCALE);
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        earth.updateAngle({0, -90 * deltaTime, 0});
+        earth.updateAngle({0, -90 * realDeltaTime, 0});
     }
 
     if (IsKeyDown(KEY_LEFT)) {
-        earth.updateAngle({0, 90 * deltaTime, 0});
+        earth.updateAngle({0, 90 * realDeltaTime, 0});
     }
 
     if (IsKeyPressed(KEY_S)) {
@@ -72,14 +74,27 @@ int main() {
     };
 
     
+    constexpr double earthMass = 5.972e24;
+    constexpr double moonMass = 7.342e22;
+    constexpr double orbitalDistance = 2.5;
+    const double relativeOrbitalSpeed =
+        std::sqrt(G * earthMass /
+                  (orbitalDistance * METERS_PER_SCENE_UNIT)) /
+        METERS_PER_SCENE_UNIT;
+    const double totalMass = earthMass + moonMass;
+
     // Creating Earth
     celestialObjects.add("Earth", 
-        planet(5.972e24, 6371.0, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, earthComposition)
+        planet(earthMass, 6371.0, {0.0f, 0.0f, 0.0f},
+               {0.0f, 0.0f, static_cast<float>(-relativeOrbitalSpeed * moonMass / totalMass)},
+               earthComposition)
     );
     
     // Creating Moon
     celestialObjects.add("Moon", 
-        planet(7.342e22, 1737.0, {2.5f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, moonComposition)
+        planet(moonMass, 1737.0, {static_cast<float>(orbitalDistance), 0.0f, 0.0f},
+               {0.0f, 0.0f, static_cast<float>(relativeOrbitalSpeed * earthMass / totalMass)},
+               moonComposition)
     );
 
     // 1. Load shader for plane
@@ -95,7 +110,6 @@ int main() {
     // Mass Related Calculations
     int massCountLocation = GetShaderLocation(bezierShader, "massCount");
     int massPointsLocation = GetShaderLocation(bezierShader, "massPoints");
-    std::array<Vector4, MAX_MASS_POINTS> massPoints{};
     
     // Should window close? That's up to you!
     while (!WindowShouldClose()) {
@@ -103,12 +117,10 @@ int main() {
         // Camera
         UpdateCamera(&camera, CAMERA_FREE);
         // DeltaTime
-        float deltaTime = GetFrameTime();
-        // Update Planets
-        celestialObjects.get("Earth").Update(deltaTime);
-        celestialObjects.get("Moon").Update(deltaTime);
+        const float realDeltaTime = GetFrameTime(); //actual dt
+        const float deltaTime = realDeltaTime * SIMULATION_TIME_SCALE; //the time passing in the sim
 
-
+        
 
         // Key Logic
         if (IsKeyPressed(KEY_F11)) {
@@ -126,21 +138,18 @@ int main() {
 
 
 
-        // Get position in memory of planet
-        planet& earth = celestialObjects.get("Earth");
-        planet& moon = celestialObjects.get("Moon");
-        massPoints[0] = earth.getMassPoint();
-        massPoints[1] = moon.getMassPoint();
-        ArrowKeys(earth);
+        ArrowKeys(celestialObjects.get("Earth"), realDeltaTime);
+
+        celestialObjects.update(deltaTime);
+       
         int massCount = 2;
         SetShaderValue(bezierShader, massCountLocation, &massCount, SHADER_UNIFORM_INT);
         SetShaderValueV(
             bezierShader,
             massPointsLocation,
-            massPoints.data(),
+            celestialObjects.massPoints().data(),
             SHADER_UNIFORM_VEC4,
-            massCount
-        );
+            massCount);
 
         // FRONTEND DRAWING
         BeginDrawing();
@@ -158,8 +167,7 @@ int main() {
         rlDisableWireMode();
         rlEnableDepthMask();
 
-        earth.Draw();
-        moon.Draw();
+        celestialObjects.draw();
 
         rlEnableBackfaceCulling();
 
@@ -167,7 +175,6 @@ int main() {
 
         DrawText("Universe Simulator", 20, 20, 25, WHITE);
         DrawFPS(20, 55);
-
         EndDrawing();
     }
 

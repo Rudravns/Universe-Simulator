@@ -30,9 +30,9 @@ struct celest_attr { // Celestial Attributes
     
     // space position
     Vector3 position;
-    Vector3 velocity = {0};
-    Vector3 acceleration = {0};
-    Vector3 Direction = {0}; 
+    Vector3 velocity = {0.0f, 0.0f, 0.0f};
+    Vector3 acceleration = {0.0f, 0.0f, 0.0f};
+    Vector3 Direction = {0.0f, 0.0f, 0.0f};
     
     
 };

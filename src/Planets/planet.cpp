@@ -1,4 +1,6 @@
 #include "Planets/planet.h"
+#include "Planets/celestial.h"
+#include "Physics/Planets/planethandler.h"
 #include <cmath>
 
 // Constructor implementation
@@ -14,6 +16,11 @@ planet::planet(double mass, double radius, Vector3 position, Vector3 velocity,
 
 // Update implementation
 void planet::Update(float deltaTime) {
+    attributes.velocity = Vector3Add(
+        attributes.velocity,
+        Vector3Scale(attributes.acceleration, deltaTime)
+    );
+
     const float yaw = static_cast<float>(attributes.Direction.y * DEG2RAD);
     const float forwardX = std::sin(yaw);
     const float forwardZ = std::cos(yaw);
@@ -24,13 +31,35 @@ void planet::Update(float deltaTime) {
 
 }
 
+void planet::Update_Physics(float deltaTime, Celestial_Objects &system)
+{   
+    Vector3 final_acc = {0.0f, 0.0f, 0.0f};
+    for (planet* p : system.get_all()){
+        if (p == this) {continue;}
+        final_acc = Vector3Add(final_acc, accelerationDueToGravity(getRaw(), p->getRaw()));
+    }
 
-void planet::Push(Vector3 velocity_ip){
+    attributes.acceleration = final_acc;
+
+    attributes.velocity = Vector3Add(
+        attributes.velocity,
+        Vector3Scale(attributes.acceleration, deltaTime)
+    );
+
+    // Directly integrate velocity into position
+    attributes.position.x += attributes.velocity.x * deltaTime;
+    attributes.position.z += attributes.velocity.z * deltaTime;
+    attributes.position.y += attributes.velocity.y * deltaTime;
+    
+}
+
+void planet::Push(Vector3 velocity_ip)
+{
     attributes.velocity = Vector3Add(velocity_ip, attributes.velocity);
 }
 
-void planet::Stop(){attributes.velocity = {0};}
-void planet::ZeroAcceleration(){attributes.acceleration = {0};}
+void planet::Stop(){attributes.velocity = {0.0f, 0.0f, 0.0f};}
+void planet::ZeroAcceleration(){attributes.acceleration = {0.0f, 0.0f, 0.0f};}
 
 void planet::Change_Acceleration(Vector3 dt){ 
     attributes.acceleration = Vector3Add(dt, attributes.acceleration);

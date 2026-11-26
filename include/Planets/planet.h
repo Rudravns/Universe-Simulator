@@ -7,6 +7,7 @@
 #include "raymath.h"
 #include <algorithm>
 
+struct Celestial_Objects;
 
 class planet {
 public:
@@ -17,13 +18,15 @@ public:
 
 
     void Update(float deltaTime);
+    void Update_Physics(float deltaTime, Celestial_Objects &system);
+
     void Push(Vector3 velocity_ip);
     void PushForward(double push);
     void Change_Acceleration(Vector3 dt);
     void ZeroAcceleration();
     void Draw() const; 
     void Stop();
-
+    
     void updateAngle(Vector3 delta_angle);
     
     Vector4 getRaw();
