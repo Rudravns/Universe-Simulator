@@ -7,24 +7,29 @@
 #include "Planets/celestial.h"
 
 static constexpr int MAX_MASS_POINTS = 8;
-void ArrowKeys(planet& earth){
+void ArrowKeys(planet& earth) {
+    const float deltaTime = GetFrameTime();
+
     if (IsKeyDown(KEY_UP)) {
-        earth.PushForward(10 * GetFrameTime() * 60);
+        earth.PushForward(10 * deltaTime);
     }
     if (IsKeyDown(KEY_DOWN)) {
-      earth.PushForward(-10 * GetFrameTime() * 60);
+        earth.PushForward(-10 * deltaTime);
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        earth.updateAngle({0, -5 * GetFrameTime() * 60, 0});
+        earth.updateAngle({0, -90 * deltaTime, 0});
     }
 
     if (IsKeyDown(KEY_LEFT)) {
-        earth.updateAngle({0, 5 * GetFrameTime() * 60, 0});
+        earth.updateAngle({0, 90 * deltaTime, 0});
+    }
+
+    if (IsKeyPressed(KEY_S)) {
+        earth.Stop();
     }
 }
 int main() {
-    int age;
-    std::cin >> age;
+
     
     // Window
     const int screenWidth = 1280;

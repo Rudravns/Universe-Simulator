@@ -1,4 +1,5 @@
 #include "Planets/planet.h"
+#include <cmath>
 
 // Constructor implementation
 planet::planet(double mass, double radius, Vector3 position, Vector3 velocity,
@@ -13,9 +14,14 @@ planet::planet(double mass, double radius, Vector3 position, Vector3 velocity,
 
 // Update implementation
 void planet::Update(float deltaTime) {
-    attributes.position.x += attributes.velocity.x * deltaTime;
+    const float yaw = static_cast<float>(attributes.Direction.y * DEG2RAD);
+    const float forwardX = std::sin(yaw);
+    const float forwardZ = std::cos(yaw);
+
+    attributes.position.x += forwardX * attributes.velocity.x * deltaTime ;
+    attributes.position.z += forwardZ * attributes.velocity.z * deltaTime;
     attributes.position.y += attributes.velocity.y * deltaTime;
-    attributes.position.z += attributes.velocity.z * deltaTime;
+
 }
 
 
@@ -35,9 +41,13 @@ void planet::updateAngle(Vector3 delta_angle){
 }
 
 void planet::PushForward(double push) {
-    attributes.velocity.x += attributes.Direction.x * push;
-    attributes.velocity.y += attributes.Direction.y * push;
-    attributes.velocity.z += attributes.Direction.z * push;
+    const float yaw = static_cast<float>(attributes.Direction.y * DEG2RAD);
+    const float forwardX = std::sin(yaw);
+    const float forwardZ = std::cos(yaw);
+    const float acceleration = static_cast<float>(push);
+
+    attributes.velocity.x += forwardX * acceleration;
+    attributes.velocity.z += forwardZ * acceleration;
 }
 
 // Draw implementation

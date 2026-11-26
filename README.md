@@ -57,6 +57,8 @@ Universe-Simulator/
 |---|---|
 | WASD | Camera movement |
 | Mouse | Camera rotation |
+| Up / Down | Accelerate Earth forward / backward |
+| Left / Right | Turn Earth |
 | TAB | Toggle mouse lock |
 | F11 | Toggle fullscreen |
 | ESC | Exit simulation |
