@@ -12,6 +12,11 @@ $ProjectRoot = $PSScriptRoot
 Set-Location $ProjectRoot
 
 function Find-CommandPath {
+    <#
+    .SYNOPSIS
+    Finds the first application matching a list of executable names.
+    #>
+    # Names: executable names to search for in application PATH entries.
     param([string[]]$Names)
 
     foreach ($name in $Names) {
@@ -26,6 +31,10 @@ function Find-CommandPath {
 }
 
 function Find-CompilerPath {
+    <#
+    .SYNOPSIS
+    Resolves a MinGW or Clang C++ compiler from PATH or common Windows locations.
+    #>
     $compiler = Find-CommandPath @("g++.exe", "clang++.exe")
     if ($compiler) {
         return $compiler

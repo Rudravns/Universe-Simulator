@@ -10,6 +10,12 @@
 
 
 static constexpr float SIMULATION_TIME_SCALE = 3600.0f;
+
+/**
+ * @brief Processes keyboard controls for Earth movement and stopping.
+ * @param earth Planet controlled by the arrow and stop keys.
+ * @param realDeltaTime Real elapsed frame time in seconds.
+ */
 void ArrowKeys(planet& earth, float realDeltaTime) {
 
     if (IsKeyDown(KEY_UP)) {
@@ -30,6 +36,9 @@ void ArrowKeys(planet& earth, float realDeltaTime) {
         earth.Stop();
     }
 }
+
+/// @brief Initializes the scene, runs the render/update loop, and cleans up resources.
+/// @return Process exit code.
 int main() {
 
     

@@ -1,6 +1,7 @@
 #include "windows/Window.h"
 #include "raylib.h"
 
+/// @brief Switches monitor-fullscreen state while preserving a windowed fallback size.
 void ToggleFullscreenWindow(int windowWidth, int windowHeight) {
     if (!IsWindowFullscreen()) { // Windowed --> Fullscreen
         int monitor = GetCurrentMonitor();
@@ -12,6 +13,7 @@ void ToggleFullscreenWindow(int windowWidth, int windowHeight) {
     }
 }
 
+/// @brief Caps the supplied window dimensions at the current monitor dimensions.
 void RescaleWindow(int newWindowWidth, int newWindowHeight) {
     // Only rescale window if it's not fullscreen
     if (!IsWindowFullscreen()) {

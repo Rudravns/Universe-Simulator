@@ -4,9 +4,7 @@
 #include <cmath>
 
 
-/*
-    Vector4: x position, y position, z position, mass
-*/
+/// @brief Applies Newtonian gravity with the scene-unit and mass conversions.
 Vector3 accelerationDueToGravity(Vector4 planet1, Vector4 planet2) {
     Vector3 direction = {
         planet2.x - planet1.x,
@@ -34,7 +32,7 @@ Vector3 accelerationDueToGravity(Vector4 planet1, Vector4 planet2) {
     };
 }
 
-// Vector4: x position, y position, z position, mass
+/// @brief Computes signed axis differences as absolute distance components.
 Vector3 distanceBetweenPlanets(Vector4 planet1, Vector4 planet2) {
     double x = std::pow(planet2.x - planet1.x, 2);
     double y = std::pow(planet2.y - planet1.y, 2);

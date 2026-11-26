@@ -1,6 +1,7 @@
 #include "Planets/planet.h"
 #include "Planets/celestial.h"
 
+/// @brief Inserts a planet unless the system is full or the name already exists.
 bool Celestial_Objects::add(const std::string &name, const planet &newPlanet)
 {
     if (Planets.size() >= MAX_PLANETS)
@@ -13,9 +14,7 @@ bool Celestial_Objects::add(const std::string &name, const planet &newPlanet)
     return inserted;
 }
 
-/*
-Getter but only read-only
-*/
+/// @brief Finds a planet and returns it through a const reference.
 const planet& Celestial_Objects::get(const std::string &name) const
 {
     auto Iterator = Planets.find(name); // find the planet name from the list of planets
@@ -27,7 +26,8 @@ const planet& Celestial_Objects::get(const std::string &name) const
     throw std::runtime_error("Planet not found: " + name);
 }
 
- std::vector<planet*> Celestial_Objects::get_all() {
+/// @brief Builds a temporary vector of pointers to all stored planets.
+std::vector<planet*> Celestial_Objects::get_all() {
     std::vector<planet*> all_planets;
     all_planets.reserve(Planets.size()); //saves/sets aside memory for this new list so it can fill it properly without fighting for space
 
@@ -38,10 +38,7 @@ const planet& Celestial_Objects::get(const std::string &name) const
     return all_planets; // return the final copy
 }
 
-    /*
-    Getter but read and write
-    */
-
+/// @brief Finds a planet and returns it through a mutable reference.
 planet &Celestial_Objects::get(const std::string &name)
 {
     auto Iterator = Planets.find(name);
@@ -62,6 +59,7 @@ void Celestial_Objects::update(float deltatime){
     }
 }
 
+/// @brief Converts every stored planet into the position/mass format used by shaders.
 const std::array<Vector4, Celestial_Objects::MAX_MASS_POINTS>& Celestial_Objects::massPoints()
 {
     std::size_t i = 0;
@@ -76,6 +74,7 @@ const std::array<Vector4, Celestial_Objects::MAX_MASS_POINTS>& Celestial_Objects
     return m_massPoints;
 }
 
+/// @brief Renders every stored planet.
 void Celestial_Objects::draw()
 {
     for (auto &pair : Planets)

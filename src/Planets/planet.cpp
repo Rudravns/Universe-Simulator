@@ -3,7 +3,7 @@
 #include "Physics/Planets/planethandler.h"
 #include <cmath>
 
-// Constructor implementation
+/// @brief Initializes all planet attributes and derives its initial display color.
 planet::planet(double mass, double radius, Vector3 position, Vector3 velocity,
                const std::array<Element, 10>& composition) {
     attributes.mass = mass;
@@ -14,7 +14,7 @@ planet::planet(double mass, double radius, Vector3 position, Vector3 velocity,
     color = getColorFromElementComposition();
 }
 
-// Update implementation
+/// @brief Updates velocity and position using the body's facing direction.
 void planet::Update(float deltaTime) {
     attributes.velocity = Vector3Add(
         attributes.velocity,
@@ -31,6 +31,7 @@ void planet::Update(float deltaTime) {
 
 }
 
+/// @brief Sums all gravitational accelerations, then integrates velocity and position.
 void planet::Update_Physics(float deltaTime, Celestial_Objects &system)
 {   
     Vector3 final_acc = {0.0f, 0.0f, 0.0f};
@@ -53,22 +54,29 @@ void planet::Update_Physics(float deltaTime, Celestial_Objects &system)
     
 }
 
+/// @brief Adds the supplied velocity vector to the current velocity.
 void planet::Push(Vector3 velocity_ip)
 {
     attributes.velocity = Vector3Add(velocity_ip, attributes.velocity);
 }
 
+/// @brief Sets the velocity vector to zero.
 void planet::Stop(){attributes.velocity = {0.0f, 0.0f, 0.0f};}
+
+/// @brief Sets the acceleration vector to zero.
 void planet::ZeroAcceleration(){attributes.acceleration = {0.0f, 0.0f, 0.0f};}
 
+/// @brief Adds an acceleration delta to the planet's current acceleration.
 void planet::Change_Acceleration(Vector3 dt){ 
     attributes.acceleration = Vector3Add(dt, attributes.acceleration);
 }
 
+/// @brief Adds a delta to the planet's facing Euler angles.
 void planet::updateAngle(Vector3 delta_angle){
     attributes.Direction =  Vector3Add(delta_angle, attributes.Direction);
 }
 
+/// @brief Changes velocity along the planet's current horizontal facing direction.
 void planet::PushForward(double push) {
     const float yaw = static_cast<float>(attributes.Direction.y * DEG2RAD);
     const float forwardX = std::sin(yaw);
@@ -79,7 +87,7 @@ void planet::PushForward(double push) {
     attributes.velocity.z += forwardZ * acceleration;
 }
 
-// Draw implementation
+/// @brief Draws a sphere at the planet position using a radius scaled for the scene.
 void planet::Draw() const {
     // The model stores physical radius in kilometers. Scale it into scene units.
     constexpr double RADIUS_SCALE = 1.0 / 6000.0;
@@ -90,6 +98,7 @@ void planet::Draw() const {
     );
 }
 
+/// @brief Converts element contributions into a normalized Raylib display color.
 Color planet::getColorFromElementComposition() const {
     Vector4 vecColor{0.0f, 0.0f, 0.0f, 1.0f}; // Default to black
 
@@ -149,6 +158,7 @@ Color planet::getColorFromElementComposition() const {
     return ColorFromNormalized(vecColor);
 }
 
+/// @brief Creates the position and shader strength value for the spacetime warp.
 Vector4 planet::getMassPoint(){
     float VisualStrength;
     if (attributes.mass <= 0.0){
@@ -169,6 +179,7 @@ Vector4 planet::getMassPoint(){
     };
 }
 
+/// @brief Creates the raw position and physical mass value used by gravity functions.
 Vector4 planet::getRaw(){
         
     return {

@@ -96,6 +96,24 @@ The script compiles all C++ sources into `main.exe` and runs it if compilation s
 
 Future development may add N-body gravity, orbital mechanics, multiple interacting celestial bodies, and more accurate physical-to-visual scaling.
 
+## Code Documentation
+
+The C++ interfaces use Doxygen-style documentation for classes, functions, constants, and parameters. Generated API documentation can be created with Doxygen if it is installed:
+
+```powershell
+doxygen
+```
+
+Key documented areas include:
+
+- `planet`: construction, motion, acceleration, thrust, rendering, and derived shader properties.
+- `Celestial_Objects`: named planet storage, lookup, physics updates, and drawing.
+- Physics helpers: gravitational acceleration and distance calculations.
+- Window helpers: fullscreen toggling and window resizing.
+- Plane helpers: loading the spacetime vertex shader.
+
+When editing a public function or parameter, update both its declaration comment and, when behavior differs, its implementation comment.
+
 ---
 
 **Status:** In Development
