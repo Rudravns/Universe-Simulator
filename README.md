@@ -10,6 +10,7 @@ The project renders celestial bodies in a 3D scene and uses a custom shader to c
 - Free-look 3D camera
 - Earth and Moon models with element-based colors
 - Visual scaling from physical radii into scene units
+- Circular orbital velocity initialization when adding a body around a named parent
 - Custom vertex shader for a warped spacetime plane
 - Basic per-frame position updates
 - Fullscreen toggle (`F11`)
@@ -59,6 +60,7 @@ Universe-Simulator/
 | Mouse | Camera rotation |
 | Up / Down | Accelerate Earth forward / backward |
 | Left / Right | Turn Earth |
+| X | Stop Earth |
 | TAB | Toggle mouse lock |
 | F11 | Toggle fullscreen |
 | ESC | Exit simulation |

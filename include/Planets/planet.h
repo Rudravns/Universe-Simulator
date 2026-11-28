@@ -15,15 +15,23 @@ public:
     Color color;
 
     /**
-     * @brief Constructs a celestial body with physical and visual properties.
+     * @brief Constructs a celestial body at the origin with an initial velocity.
      * @param mass Mass of the body in kilograms.
      * @param radius Physical radius of the body in kilometers.
-     * @param position Initial position in scene units.
-     * @param velocity Initial velocity in scene units per second.
      * @param composition Element composition used to derive the body's color.
+     * @param velocity Initial velocity in scene units per second.
      */
-    planet(double mass, double radius, Vector3 position, Vector3 velocity,
-           const std::array<Element, 10>& composition);
+    planet(double mass, double radius, const std::array<Element, 10>& composition,
+           Vector3 velocity = {0.0f, 0.0f, 0.0f});
+    /**
+     * @brief Constructs a celestial body at the origin with an initial velocity.
+     * @param mass Mass of the body in kilograms.
+     * @param radius Physical radius of the body in kilometers.
+     * @param color Constant color for the body.
+     * @param velocity Initial velocity in scene units per second.
+     */
+    planet(double mass, double radius, Color color,
+           Vector3 velocity = {0.0f, 0.0f, 0.0f});
 
     /// @brief Updates orientation-based motion without gravitational integration.
     /// @param deltaTime Simulation time elapsed since the previous frame.

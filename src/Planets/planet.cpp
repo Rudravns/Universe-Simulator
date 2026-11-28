@@ -1,17 +1,27 @@
 #include "Planets/planet.h"
 #include "Planets/celestial.h"
 #include "Physics/Planets/planethandler.h"
+#include <algorithm>
 #include <cmath>
 
 /// @brief Initializes all planet attributes and derives its initial display color.
-planet::planet(double mass, double radius, Vector3 position, Vector3 velocity,
-               const std::array<Element, 10>& composition) {
+planet::planet(double mass, double radius, const std::array<Element, 10>& composition,
+               Vector3 velocity) {
     attributes.mass = mass;
     attributes.radius = radius;
-    attributes.position = position;
+    attributes.position = {0.0f, 0.0f, 0.0f};
     attributes.velocity = velocity;
     attributes.composition = composition;
     color = getColorFromElementComposition();
+}
+/// @brief Initializes all planet attributes and its initial display color.
+planet::planet(double mass, double radius, Color color, Vector3 velocity)
+{
+    attributes.mass = mass;
+    attributes.radius = radius;
+    attributes.position = {0.0f, 0.0f, 0.0f};
+    attributes.velocity = velocity;
+    this->color = color;
 }
 
 /// @brief Updates velocity and position using the body's facing direction.
@@ -89,12 +99,17 @@ void planet::PushForward(double push) {
 
 /// @brief Draws a sphere at the planet position using a radius scaled for the scene.
 void planet::Draw() const {
-    // The model stores physical radius in kilometers. Scale it into scene units.
-    constexpr double RADIUS_SCALE = 1.0 / 6000.0;
+    constexpr double VISUAL_RADIUS_SCALE = 0.06;
+    constexpr double MIN_VISUAL_RADIUS = 0.06;
+    const double physicalRadiusInSceneUnits =
+        attributes.radius * 1000.0 / METERS_PER_SCENE_UNIT;
+    const float visualRadius = static_cast<float>(
+        std::max(physicalRadiusInSceneUnits * VISUAL_RADIUS_SCALE,
+                 MIN_VISUAL_RADIUS));
     DrawSphere(
         attributes.position,
-        static_cast<float>(attributes.radius * RADIUS_SCALE),
-        getColorFromElementComposition()
+        visualRadius,
+        color
     );
 }
 

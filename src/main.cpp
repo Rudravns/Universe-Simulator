@@ -4,12 +4,15 @@
 #include "../include/Planets/planet.h"
 #include "../include/Physics/Planets/planethandler.h"
 #include "../include/windows/Window.h"
+#include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cmath>
 #include "Planets/celestial.h"
 
 
-static constexpr float SIMULATION_TIME_SCALE = 3600.0f;
+static constexpr float SIMULATION_TIME_SCALE = 10.0f;
+static constexpr float MAX_SIMULATION_STEP = 1.0f / 60.0f;
 
 /**
  * @brief Processes keyboard controls for Earth movement and stopping.
@@ -32,7 +35,7 @@ void ArrowKeys(planet& earth, float realDeltaTime) {
         earth.updateAngle({0, 90 * realDeltaTime, 0});
     }
 
-    if (IsKeyPressed(KEY_S)) {
+    if (IsKeyPressed(KEY_X)) {
         earth.Stop();
     }
 }
@@ -49,7 +52,7 @@ int main() {
 
     // 3D Camera
     Camera3D camera{};
-    camera.position = { 5.0f, 5.0f, 5.0f };
+    camera.position = { 0.0f, 55.0f, 70.0f };
     camera.target = { 0.0f, 0.0f, 0.0f };
     camera.up = { 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
@@ -73,52 +76,48 @@ int main() {
         Element::Helium, Element::Iron, Element::Silicon, Element::Magnesium,
         Element::Sulfur, Element::Calcium
     };
-    const std::array<Element, 10> moonComposition{
-        Element::Oxygen,
-        Element::Silicon,
-        Element::Magnesium,
-        Element::Iron,
-        Element::Calcium,
-        Element::Aluminum
-    };
-
     
     constexpr double earthMass = 5.972e24;
     constexpr double moonMass = 7.342e22;
-    constexpr double orbitalDistance = 2.5;
-    const double relativeOrbitalSpeed =
-        std::sqrt(G * earthMass /
-                  (orbitalDistance * METERS_PER_SCENE_UNIT)) /
-        METERS_PER_SCENE_UNIT;
-    const double totalMass = earthMass + moonMass;
+    constexpr double sunMass = 1.9891e30;
+    constexpr float earthOrbitDistance = 30.0f;
+    constexpr float moonOrbitDistance = 0.13f;
+
+    celestialObjects.add("Sun",
+    planet(sunMass, 695700, YELLOW)
+    );
 
     // Creating Earth
-    celestialObjects.add("Earth", 
-        planet(earthMass, 6371.0, {0.0f, 0.0f, 0.0f},
-               {0.0f, 0.0f, static_cast<float>(-relativeOrbitalSpeed * moonMass / totalMass)},
-               earthComposition)
+    celestialObjects.addOrbiting("Earth", "Sun",
+        planet(earthMass, 6371.0, earthComposition),
+        {earthOrbitDistance, 0.0f, 0.0f}
     );
     
     // Creating Moon
-    celestialObjects.add("Moon", 
-        planet(moonMass, 1737.0, {static_cast<float>(orbitalDistance), 0.0f, 0.0f},
-               {0.0f, 0.0f, static_cast<float>(relativeOrbitalSpeed * earthMass / totalMass)},
-               moonComposition)
+    celestialObjects.addOrbiting("Moon", "Earth",
+        planet(moonMass, 1737.0, GRAY),
+        {moonOrbitDistance, 0.0f, 0.0f}
     );
 
     // 1. Load shader for plane
     Shader bezierShader = Load_plane_shader();
 
     // 2. Create a subdivided 3D plane mesh so it has enough vertices to bend along the curve
-    Mesh planeMesh = GenMeshPlane(12.0f, 12.0f, std::pow(2, 7), std::pow(2, 7)); //parm are w, l, resx, resy ; res is in bit logic
+    constexpr float fabricSize = 120.0f;
+    constexpr int fabricSubdivisions = 256;
+    Mesh planeMesh = GenMeshPlane(
+        fabricSize, fabricSize, fabricSubdivisions, fabricSubdivisions);
     Model planeModel = LoadModelFromMesh(planeMesh);
 
-    // 3. Attach your custom Bezier shader to the model's material
+    // 3. Attach custom Bezier shader to the model's material
     planeModel.materials[0].shader = bezierShader;
 
     // Mass Related Calculations
     int massCountLocation = GetShaderLocation(bezierShader, "massCount");
     int massPointsLocation = GetShaderLocation(bezierShader, "massPoints");
+    const int massCount = static_cast<int>(std::min(
+        celestialObjects.get_all().size(),
+        static_cast<std::size_t>(Celestial_Objects::MAX_MASS_POINTS)));
     
     // Should window close? That's up to you!
     while (!WindowShouldClose()) {
@@ -127,7 +126,7 @@ int main() {
         UpdateCamera(&camera, CAMERA_FREE);
         // DeltaTime
         const float realDeltaTime = GetFrameTime(); //actual dt
-        const float deltaTime = realDeltaTime * SIMULATION_TIME_SCALE; //the time passing in the sim
+        const float deltaTime = realDeltaTime * SIMULATION_TIME_SCALE;
 
         
 
@@ -149,9 +148,14 @@ int main() {
 
         ArrowKeys(celestialObjects.get("Earth"), realDeltaTime);
 
-        celestialObjects.update(deltaTime);
+        //limiting after how many time physics updates
+        const int physicsSteps = std::max(
+            1, static_cast<int>(std::ceil(deltaTime / MAX_SIMULATION_STEP)));
+        const float physicsStep = deltaTime / physicsSteps;
+        for (int step = 0; step < physicsSteps; ++step) {
+            celestialObjects.update(physicsStep);
+        }
        
-        int massCount = 2;
         SetShaderValue(bezierShader, massCountLocation, &massCount, SHADER_UNIFORM_INT);
         SetShaderValueV(
             bezierShader,

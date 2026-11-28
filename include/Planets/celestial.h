@@ -25,6 +25,20 @@ public:
     /// @param newPlanet Planet instance to insert.
     /// @return true if the planet was inserted; false for duplicate names or capacity limits.
     bool add(const std::string &name, const planet &newPlanet);
+
+    /**
+     * @brief Adds a planet with a circular orbit around an existing planet.
+     * @param name Unique name used to retrieve the new planet.
+     * @param parentName Name of the body it orbits.
+     * @param newPlanet Planet instance to insert; its initial velocity and position are replaced.
+     * @param relativePosition Initial position offset from the parent, in scene units.
+     * @return true if the planet was inserted; false for duplicate names or capacity limits.
+     * @throws std::runtime_error if the parent does not exist.
+     * @throws std::invalid_argument if masses are not finite and positive, or the orbit
+     *         offset is zero or non-finite.
+     */
+    bool addOrbiting(const std::string &name, const std::string &parentName,
+                     const planet &newPlanet, Vector3 relativePosition);
     
     /// @brief Gets a planet without allowing modification.
     /// @param name Name of the planet to retrieve.
