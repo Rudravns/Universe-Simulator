@@ -15,6 +15,7 @@ The project renders celestial bodies in a 3D scene and uses a custom shader to c
 - Basic per-frame position updates
 - Fullscreen toggle (`F11`)
 - Mouse cursor lock toggle (`TAB`)
+- Planet focus with a rendered-radius camera boundary and planet following
 
 ## Tech Stack
 
@@ -34,6 +35,7 @@ Universe-Simulator/
 │   │   ├── celestial.h
 │   │   └── planet.h
 │   └── windows/
+│       ├── Camera.h
 │       ├── Window.h
 │       └── plane.h
 ├── src/
@@ -43,6 +45,7 @@ Universe-Simulator/
 │   │   ├── celestial.cpp
 │   │   └── planet.cpp
 │   └── windows/
+│       ├── Camera.cpp
 │       ├── plane.cpp
 │       └── window.cpp
 ├── Shaders/
@@ -56,11 +59,12 @@ Universe-Simulator/
 
 | Key | Action |
 |---|---|
-| WASD | Camera movement |
+| WASD | Move the camera |
+| Space / Left Ctrl | Move the camera up / down |
+| Left Shift | Sprint |
 | Mouse | Camera rotation |
-| Up / Down | Accelerate Earth forward / backward |
-| Left / Right | Turn Earth |
-| X | Stop Earth |
+| Up / Down | Focus the next / previous planet |
+| X | Clear planet focus |
 | TAB | Toggle mouse lock |
 | F11 | Toggle fullscreen |
 | ESC | Exit simulation |
@@ -92,7 +96,7 @@ Set `RAYLIB_ROOT` or pass `-RaylibRoot` when Raylib is outside a standard locati
 
 Use `-Compiler C:\path\to\g++.exe` if MinGW-w64 is not on `PATH`, or `-NoRun` to compile without starting the simulator.
 
-The script compiles all C++ sources into `main.exe` and runs it if compilation succeeds.
+The script compiles all C++ sources into `Universe-Simulator.exe` and runs it if compilation succeeds.
 
 ## Future Goals
 
@@ -113,6 +117,7 @@ Key documented areas include:
 - Physics helpers: gravitational acceleration and distance calculations.
 - Window helpers: fullscreen toggling and window resizing.
 - Plane helpers: loading the spacetime vertex shader.
+- Focus controls: Up/Down cycle planets; X clears focus. The camera follows the focused planet and is eased back inside its rendered-radius boundary.
 
 When editing a public function or parameter, update both its declaration comment and, when behavior differs, its implementation comment.
 

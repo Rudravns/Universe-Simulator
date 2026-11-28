@@ -60,6 +60,9 @@ public:
     /// @brief Draws the body as a sphere in the 3D scene.
     void Draw() const; 
 
+    /// @brief Gets the sphere radius used for rendering, in scene units.
+    float visualRadius() const;
+
     /// @brief Stops all movement by setting velocity to zero.
     void Stop();
     

@@ -4,7 +4,7 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/main.exe",
+            "program": "${workspaceFolder}/Universe-Simulator.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

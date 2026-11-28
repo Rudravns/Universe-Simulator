@@ -17,8 +17,12 @@ private:
 
     std::unordered_map<std::string, planet> Planets;
     std::array<Vector4, MAX_MASS_POINTS> m_massPoints {};
-
+    std::vector<planet*> all_planets;
 public: 
+
+    int planet_focus = 0;
+    /// @brief Maximum clearance between the player and a focused planet's surface, in scene units.
+    float max_fly_distance = 1;
 
     /// @brief Adds a named planet if capacity is available and the name is unused.
     /// @param name Unique name used to retrieve the planet.
@@ -52,6 +56,16 @@ public:
     /// @throws std::runtime_error if no planet has the supplied name.
     planet& get(const std::string &name);
 
+    /// @brief Gets the currently focused planet, if a valid focus is selected.
+    /// @return Pointer to the focused planet, or nullptr when no planet is focused.
+    const planet* focusedPlanet() const;
+
+    /// @brief Advances focus to the next planet, cycling back to no focus.
+    void focusNextPlanet();
+
+    /// @brief Moves focus to the previous planet, cycling back to the last planet.
+    void focusPreviousPlanet();
+
     /// @brief Creates pointers to every planet currently in the system.
     /// @return Vector of pointers to the stored planets.
     std::vector<planet*> get_all();
@@ -59,6 +73,10 @@ public:
     /// @brief Advances every planet through one physics update.
     /// @param deltatime Simulation time elapsed since the previous update.
     void update(float deltatime);
+
+    /// @brief Gets the maximum player distance from the focused planet's center.
+    /// @return Surface radius plus max_fly_distance, or zero when no planet is focused.
+    float planetFocus() const;
 
     /// @brief Draws every planet in the system.
     void draw();

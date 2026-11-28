@@ -4,6 +4,7 @@
 #include "../include/Planets/planet.h"
 #include "../include/Physics/Planets/planethandler.h"
 #include "../include/windows/Window.h"
+#include "windows/Camera.h"
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -14,31 +15,8 @@
 static constexpr float SIMULATION_TIME_SCALE = 10.0f;
 static constexpr float MAX_SIMULATION_STEP = 1.0f / 60.0f;
 
-/**
- * @brief Processes keyboard controls for Earth movement and stopping.
- * @param earth Planet controlled by the arrow and stop keys.
- * @param realDeltaTime Real elapsed frame time in seconds.
- */
-void ArrowKeys(planet& earth, float realDeltaTime) {
 
-    if (IsKeyDown(KEY_UP)) {
-        earth.PushForward(10 * realDeltaTime / SIMULATION_TIME_SCALE);
-    }
-    if (IsKeyDown(KEY_DOWN)) {
-        earth.PushForward(-10 * realDeltaTime / SIMULATION_TIME_SCALE);
-    }
-    if (IsKeyDown(KEY_RIGHT)) {
-        earth.updateAngle({0, -90 * realDeltaTime, 0});
-    }
 
-    if (IsKeyDown(KEY_LEFT)) {
-        earth.updateAngle({0, 90 * realDeltaTime, 0});
-    }
-
-    if (IsKeyPressed(KEY_X)) {
-        earth.Stop();
-    }
-}
 
 /// @brief Initializes the scene, runs the render/update loop, and cleans up resources.
 /// @return Process exit code.
@@ -51,12 +29,7 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Universe Simulator");
 
     // 3D Camera
-    Camera3D camera{};
-    camera.position = { 0.0f, 55.0f, 70.0f };
-    camera.target = { 0.0f, 0.0f, 0.0f };
-    camera.up = { 0.0f, 1.0f, 0.0f };
-    camera.fovy = 45.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+    PlayerCamera camera;
 
     // FPS
     int refreshRate = GetMonitorRefreshRate(GetCurrentMonitor());
@@ -104,7 +77,7 @@ int main() {
 
     // 2. Create a subdivided 3D plane mesh so it has enough vertices to bend along the curve
     constexpr float fabricSize = 120.0f;
-    constexpr int fabricSubdivisions = 256;
+    constexpr int fabricSubdivisions = 128;
     Mesh planeMesh = GenMeshPlane(
         fabricSize, fabricSize, fabricSubdivisions, fabricSubdivisions);
     Model planeModel = LoadModelFromMesh(planeMesh);
@@ -122,13 +95,9 @@ int main() {
     // Should window close? That's up to you!
     while (!WindowShouldClose()) {
         // BACKEND UPDATES
-        // Camera
-        UpdateCamera(&camera, CAMERA_FREE);
         // DeltaTime
         const float realDeltaTime = GetFrameTime(); //actual dt
         const float deltaTime = realDeltaTime * SIMULATION_TIME_SCALE;
-
-        
 
         // Key Logic
         if (IsKeyPressed(KEY_F11)) {
@@ -144,9 +113,15 @@ int main() {
             }
         }
 
-
-
-        ArrowKeys(celestialObjects.get("Earth"), realDeltaTime);
+        if (IsKeyPressed(KEY_UP)) {
+            celestialObjects.focusNextPlanet();
+        }
+        if (IsKeyPressed(KEY_DOWN)) {
+            celestialObjects.focusPreviousPlanet();
+        }
+        if (IsKeyPressed(KEY_X)) {
+            celestialObjects.planet_focus = 0;
+        }
 
         //limiting after how many time physics updates
         const int physicsSteps = std::max(
@@ -155,6 +130,13 @@ int main() {
         for (int step = 0; step < physicsSteps; ++step) {
             celestialObjects.update(physicsStep);
         }
+
+        // Camera
+        const planet* focusedPlanet = celestialObjects.focusedPlanet();
+        const Vector3* focusPosition = focusedPlanet != nullptr
+            ? &focusedPlanet->attributes.position
+            : nullptr;
+        camera.Update(realDeltaTime, focusPosition, celestialObjects.planetFocus());
        
         SetShaderValue(bezierShader, massCountLocation, &massCount, SHADER_UNIFORM_INT);
         SetShaderValueV(
@@ -168,7 +150,7 @@ int main() {
         BeginDrawing();
         ClearBackground(BLACK);
         
-        BeginMode3D(camera);
+        BeginMode3D(camera.GetRaylibCamera());
 
         // Keep the warped grid and planet surfaces visible from either side.
         rlDisableBackfaceCulling();
@@ -188,6 +170,10 @@ int main() {
 
         DrawText("Universe Simulator", 20, 20, 25, WHITE);
         DrawFPS(20, 55);
+        DrawText(TextFormat("Focused planet: %d", celestialObjects.planet_focus),
+                 20, 90, 25, WHITE);
+        DrawText(TextFormat("Max distance: %.1f", celestialObjects.planetFocus()),
+                 20, 125, 25, WHITE);
         EndDrawing();
     }
 

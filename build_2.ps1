@@ -5,10 +5,11 @@ Clear-Host
 g++ -std=c++20 `
     src/main.cpp `
     src/Planets/planet.cpp `
+    src/windows/Camera.cpp `
     src/windows/window.cpp `
     src/Planets/celestial.cpp `
     src/Physics/Planets/planethandler.cpp src/windows/plane.cpp `
-    -o main.exe `
+    -o Universe-Simulator.exe `
     -I"include" `
     -I"C:/Users/kumar1272/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/include" `
     -L"C:/Users/kumar1272/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/lib" `
@@ -16,8 +17,8 @@ g++ -std=c++20 `
 
 # Run if compilation succeeds
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "Compilation successful! Running main.exe..." -ForegroundColor Green
-    .\main.exe
+    Write-Host "Compilation successful! Running Universe-Simulator.exe..." -ForegroundColor Green
+    .\Universe-Simulator.exe
 } else {
     Write-Host "Compilation failed." -ForegroundColor Red
 }

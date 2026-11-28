@@ -97,18 +97,22 @@ void planet::PushForward(double push) {
     attributes.velocity.z += forwardZ * acceleration;
 }
 
-/// @brief Draws a sphere at the planet position using a radius scaled for the scene.
-void planet::Draw() const {
+/// @brief Gets the sphere radius used to render the planet in the scene.
+float planet::visualRadius() const {
     constexpr double VISUAL_RADIUS_SCALE = 0.06;
     constexpr double MIN_VISUAL_RADIUS = 0.06;
     const double physicalRadiusInSceneUnits =
         attributes.radius * 1000.0 / METERS_PER_SCENE_UNIT;
-    const float visualRadius = static_cast<float>(
+    return static_cast<float>(
         std::max(physicalRadiusInSceneUnits * VISUAL_RADIUS_SCALE,
                  MIN_VISUAL_RADIUS));
+}
+
+/// @brief Draws a sphere at the planet position using a radius scaled for the scene.
+void planet::Draw() const {
     DrawSphere(
         attributes.position,
-        visualRadius,
+        visualRadius(),
         color
     );
 }

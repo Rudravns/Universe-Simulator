@@ -14,6 +14,13 @@ bool Celestial_Objects::add(const std::string &name, const planet &newPlanet)
 
     // .emplace() inserts only if the key doesn't already exist
     auto [iterator, inserted] = Planets.emplace(name, newPlanet); //returns a pair, where 'inserted' is true if the insertion took place
+
+    if (inserted)
+    {
+        // iterator->second is the newly stored planet inside the unordered-map.
+        // Taking its address (&) gives a valid planet* to store in all_planets.
+        all_planets.push_back(&(iterator->second));
+    }
     return inserted;
 }
 
@@ -110,14 +117,7 @@ const planet& Celestial_Objects::get(const std::string &name) const
 
 /// @brief Builds a temporary vector of pointers to all stored planets.
 std::vector<planet*> Celestial_Objects::get_all() {
-    std::vector<planet*> all_planets;
-    all_planets.reserve(Planets.size()); //saves/sets aside memory for this new list so it can fill it properly without fighting for space
-
-    for (auto& pair : Planets) {
-        all_planets.push_back(&pair.second); //add the planet to the list, the & is giving the address to the pointer(creating a copy of it) 
-    }
-
-    return all_planets; // return the final copy
+    return all_planets;
 }
 
 /// @brief Finds a planet and returns it through a mutable reference.
@@ -131,9 +131,40 @@ planet &Celestial_Objects::get(const std::string &name)
     throw std::runtime_error("Planet not found: " + name);
 }
 
+const planet* Celestial_Objects::focusedPlanet() const
+{
+    if (planet_focus <= 0 ||
+        static_cast<std::size_t>(planet_focus) > all_planets.size())
+    {
+        return nullptr;
+    }
+
+    return all_planets[static_cast<std::size_t>(planet_focus - 1)];
+}
+
+void Celestial_Objects::focusNextPlanet()
+{
+    const std::size_t focusCount = all_planets.size() + 1;
+    const std::size_t currentFocus = planet_focus >= 0
+        ? static_cast<std::size_t>(planet_focus) % focusCount
+        : 0;
+    planet_focus = static_cast<int>((currentFocus + 1) % focusCount);
+}
+
+void Celestial_Objects::focusPreviousPlanet()
+{
+    const std::size_t focusCount = all_planets.size() + 1;
+    const std::size_t currentFocus = planet_focus >= 0
+        ? static_cast<std::size_t>(planet_focus) % focusCount
+        : 0;
+    planet_focus = static_cast<int>(
+        currentFocus == 0 ? focusCount - 1 : currentFocus - 1);
+}
+
 void Celestial_Objects::update(float deltaTime)
 {
     const std::vector<planet*> bodies = get_all();
+
     const auto calculateAccelerations = [&bodies]() {
         std::vector<Vector3> result(bodies.size(), {0.0f, 0.0f, 0.0f});
         for (std::size_t i = 0; i < bodies.size(); ++i)
@@ -175,6 +206,17 @@ void Celestial_Objects::update(float deltaTime)
             body.attributes.velocity,
             Vector3Scale(currentAccelerations[i], halfDeltaTime));
     }
+}
+
+float Celestial_Objects::planetFocus() const
+{
+    const planet* focused = focusedPlanet();
+    if (focused == nullptr)
+    {
+        return 0.0f;
+    }
+
+    return focused->visualRadius() + max_fly_distance;
 }
 
 /// @brief Converts every stored planet into the position/mass format used by shaders.

@@ -184,7 +184,7 @@ if ($sourceFiles.Count -eq 0) {
     throw "No C++ source files were found under '$ProjectRoot\src'."
 }
 
-$outputPath = Join-Path $ProjectRoot "main.exe"
+$outputPath = Join-Path $ProjectRoot "Universe-Simulator.exe"
 
 $compilerDirectory = Split-Path -Parent $compilerPath
 if (($env:PATH -split ';') -notcontains $compilerDirectory) {
